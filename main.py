@@ -74,8 +74,33 @@ y_plot_reg = model_reg.predict(X_plot, verbose=0)
 
 ax = axes[1]
 ax.scatter(X_train, y_train, alpha=0.6, label='Training data')
+ax.plot(X_plot, y_plot_true, 'k-', label='True function')
+ax.plot(X_plot, y_plot_no_reg, 'r--', label='No regularization')
+ax.plot(X_plot, y_plot_reg, 'g--', label='With L2 + dropout')
+ax.set_xlabel('X')
+ax.set_ylabel('y')
+ax.legend()
+ax.set_title('Model predictions')
+ax.grid(True)
 
+# Compare validation errors
+val_mse_no_reg = model_no_reg.evaluate(X_val, y_val, verbose=0)
+val_mse_reg = model_reg.evaluate(X_val, y_val, verbose=0)
 
+ax = axes[2]
+ax.bar(['No regularizattion', 'With L2 + dropout'],
+       [val_mse_no_reg, val_mse_reg],
+       color=['red', 'green'])
+ax.set_ylabel('Validation MSE')
+ax.set_title('Generalization Performance')
+ax.grid(True, axis='y')
+
+plt.tight_layout()
+plt.savefig("regularization_effect.png", dpi=150)
+plt.show()
+
+print(f"Validation MSE without regularization: {val_mse_no_reg:.4f}")
+print(f"Validation MSE with L2 + dropout: {val_mse_reg:.4f}")
 
 # Writed by my niece:
 #  .oo--o-oki9i0oo0oo00ooooo0o0pp+++-o
