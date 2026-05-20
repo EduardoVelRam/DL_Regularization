@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras import layers, models
-from intertools import product
+from itertools import product
 
 # Load data
 (x_train_full, y_train_full), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
@@ -40,5 +40,63 @@ def build_model(num_layers, units_per_layer=64, learning_rate=0.001):
                   metrics=['accuracy'])
     return model
 
+# Hyperparameter grid
+
+learning_rates = [0.001, 0.01]
+batch_sizes = [32, 128]
+num_layers_list = [1,2]
+
+results = []
+
+for lr, bs, layers_ in product(learning_rates, batch_sizes, num_layers_list):
+    print(f"Training: lr={lr}, batch={bs} layers={layers_}")
+    model = build_model(num_layers=layers_, learning_rate=lr)
+    history = model.fit(
+        x_train, y_train,
+        validation_data=(x_val, y_val),
+        epochs=20,
+        batch_size=bs,
+        verbose=0
+    )
+    val_acc = max(history.history['val_accuracy'])
+    results.append((val_acc, (lr, bs, layers_)))
+
+# Visualize results
+
+results.sort(key=lambda x: x[0], reverse=True)
+
+# bar plot
+configs = [f"lr{lr}\nbs={bs}\nlayers={layers_}" for _, (lr, bs, layers_) in results]
+accuracies = [acc for acc, _ in results]
+
+plt.figure(figsize=(10, 6))
+bars = plt.bar(range(len(configs)), accuracies, color='blue')
+plt.xticks(range(len(configs)), configs, rotation=0, ha='center')
+plt.ylabel('Validation Accuracy')
+plt.title('Hyperparameter Tuning: Impact on validation performance')
+plt.ylim(0, 1)
+for bar, acc in zip(bars, accuracies):
+    plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01, f'{acc:.3f}', ha='center', va='bottom')
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.savefig("hyperparameter_tuning.png", dpi=150)
+plt.show()
+
+# Print best configuration
+best_acc, (best_lr, best_bs, best_layers) = results[0]
+print("\n" + "="*50)
+print("BEST HYPERPARAMETERS FOUND")
+print("="*50)
+print(f"Learning rate: {best_lr}")
+print(f"Batch size: {best_bs}")
+print(f"Hiden layers: {best_layers}")
+print(f"Validation accuracy: {best_acc:.3f}")
+
+# Evaluate on test set with best model
+
+best_model = build_model(num_layers=best_layers, learning_rate=best_lr)
+best_model.fit(x_train, y_train, epochs=20, batch_size=best_bs, verbose=0)
+test_loss, test_acc = best_model.evaluate(x_test, y_test, verbose=0)
+print(f"Test accuracy with tuned hyperparameters: {test_acc:.3f}")
 
 #
