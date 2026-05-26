@@ -13,11 +13,10 @@ y_train = y_train_full[:2000]
 x_val = x_train_full[2000:3000] / 255.0
 y_val = y_train_full[2000:3000]
 
-# keep test set ad is
+# keep test set as is
 x_test = x_test / 255.0
 
 # Build two models
-
 def build_model(regularize=False, dropout_rate=0.0):
     model = models.Sequential()
     
