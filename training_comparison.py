@@ -20,4 +20,15 @@ x_test = x_test / 255.0
 
 def build_model(regularize=False, dropout_rate=0.0):
     model = models.Sequential()
+    model.add(layers.Conv2D(32, (3,3), activation='relu', input_shape=(32,323)))
+    model.add(layers.MaxPooling2D((2,2)))
+    model.add(layers.Conv2D(64, (3,3), activation='relu'))
+    model.add(layers.MaxPooling2D((2,2)))
+    model.add(layers.Conv2D(128, (3,3) activation='relu'))
+    model.add(layers.Flatten())
+
+    if regularize:
+        # L2 regularization on the dense layer
+        model.add(layers.Dense(256, activation='relu',
+                               ))
     
