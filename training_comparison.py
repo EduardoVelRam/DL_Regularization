@@ -56,6 +56,30 @@ datagen = ImageDataGenerator(
 datagen.fit(x_train)
 
 # Train both models
+history_a = model_a.fit(
+    x_train, y_train,
+    validation_data = (x_val, y_val),
+    epochs=50, batch_size=64, verbose=0
+)
+
+history_b = model_b.fit(
+    datagen.flow(x_train, y_train, batch_size=64),
+    validation_data=(x_val, y_val),
+    steps_per_epoch=len(x_train) // 64,
+    epochs=50, verbose=0
+)
+
+# Visualize training comparison
+
+fig, axes = plt.subplots(1,2, figsize=(14,5))
+
+# Accuracy over epochs
+ax = axes[0]
+ax.plot(history_a.history['accuracy'], label='Model A (no reg, no aug) train')
+ax.plot(history_a.history['val_accuracy'], label='Model A val')
+ax.plot(history_b.history['accuracy'], '--', label='Model B train')
+ax.plot(history_b.history['val_accuracy'], '--',label='Model B val')
+
 
 
 
