@@ -23,7 +23,7 @@ def build_model(regularize=False, dropout_rate=0.0):
     model.add(layers.MaxPooling2D((2,2)))
     model.add(layers.Conv2D(64, (3,3), activation='relu'))
     model.add(layers.MaxPooling2D((2,2)))
-    model.add(layers.Conv2D(128, (3,3) activation='relu'))
+    model.add(layers.Conv2D(128, (3,3), activation='relu'))
     model.add(layers.Flatten())
 
     if regularize:
@@ -79,14 +79,28 @@ ax.plot(history_a.history['accuracy'], label='Model A (no reg, no aug) train')
 ax.plot(history_a.history['val_accuracy'], label='Model A val')
 ax.plot(history_b.history['accuracy'], '--', label='Model B train')
 ax.plot(history_b.history['val_accuracy'], '--',label='Model B val')
+ax.set_xlabel('Epoch')
+ax.set_ylabel('Loss')
+ax.legend()
+ax.set_title('Training vs Validation Loss')
+ax.grid(True)
 
+plt.tight_layout()
+plt.savefig("real_world_training_comparison.png", dpi=150)
+plt.show()
 
+# Final evaluation on test set (simulating "deployed" performance)
 
+test_acc_a = model_a.evaluate(x_test, y_test, verbose=0)[1]
+test_acc_b = model_b.evaluate(x_test, y_test, verbose=0)[1]
 
-
-
-
-
-
+print("\n" + "="*50)
+print("REAL-WORLD DEPLOYMENT PERFORMANCE")
+print("="*50)
+print(f"Model A (overfitted) -> Test accuracy: {test_acc_a:.2%}")
+print(f"Model B (regularized+aug) -> Test accuracy: {test_acc_b:.2%}")
+print("\nVoiceover summary:")
+print(" ''  Models that use these optimization techniques (regularization and augmentation) ")
+print(" typically perform better when deployed in real-world applications.'' ")      
 
 #
